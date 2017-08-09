@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,15 +21,35 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.entity.TestBean;
 
+
+import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
+import me.chanjar.weixin.common.exception.WxErrorException;
+
 @Controller
 @RequestMapping(value = "/test")
 public class TestController {
 	
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
+	@Autowired
+    private WxMaService wxService;
 	
 	@RequestMapping(value = "/d")
-	public @ResponseBody String test(@RequestParam String bb){
-		return "test"+bb;
+	public @ResponseBody String test(@RequestParam String code){
+		
+		try {
+            WxMaJscode2SessionResult session = this.wxService.getUserService().getSessionInfo(code);
+            this.logger.info(session.getSessionKey());
+            this.logger.info(session.getOpenid());
+            this.logger.info(session.getExpiresin().toString());
+            //TODO 可以增加自己的逻辑，关联业务相关数据
+            //return JsonUtils.toJson(session);
+        } catch (WxErrorException e) {
+            this.logger.error(e.getMessage(), e);
+            return e.toString();
+        }
+		
+		return "test"+code;
 		
 	}
 	

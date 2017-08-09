@@ -1,22 +1,15 @@
-import static org.mockito.Mockito.when;
-
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 
-import org.junit.Ignore;
-import org.mockito.Mockito;
-
-import com.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hankcs.hanlp.HanLP;
-import com.hankcs.hanlp.dictionary.CustomDictionary;
-import com.hankcs.hanlp.seg.Segment;
-import com.hankcs.hanlp.seg.NShort.NShortSegment;
-import com.hankcs.hanlp.seg.common.Term;
-import com.hankcs.hanlp.tokenizer.StandardTokenizer;
-import com.util.HttpUtils;
 
 public class Test {
 
@@ -86,5 +79,54 @@ public class Test {
 //			e.printStackTrace();
 //		}
 //	}
-
+	
+	@org.junit.Test
+	public void test() {
+		String test="dsfsafsdafsadfasdfasdfsadfsadfd";
+		System.out.println(test.length()+0.00);
+		System.out.println((int)Math.ceil((test.length()+0.00)/10));
+	}
+	
+	@org.junit.Test
+	public void test2() throws Exception{
+		
+		ObjectMapper map = new ObjectMapper();
+		String xml="<?xml version=\"1.0\" encoding=\"utf-8\" ?><returnsms> <statusbox> <mobile>13857199949</mobile> <taskid>9193987</taskid> <status>10</status> <receivetime>2017/7/7 13:30:12</receivetime> <errorcode>DELIVRD</errorcode> <extno>649</extno> </statusbox> <statusbox> <mobile>18967159857</mobile> <taskid>9193987</taskid> <status>10</status> <receivetime>2017/7/7 13:30:12</receivetime> <errorcode>DELIVRD</errorcode> <extno>649</extno> </statusbox> </returnsms>";
+		InputStream stream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+		SAXBuilder sb = new SAXBuilder();  
+        Document doc = sb.build(stream);
+        Element root = doc.getRootElement();
+        iterateElement(root);
+		
+	}
+	
+	
+	private static Map  iterateElement(Element element) {  
+        List jiedian = element.getChildren();  
+        Element et = null;  
+        Map obj = new HashMap();  
+        List list = null;  
+        for (int i = 0; i < jiedian.size(); i++) {  
+            list = new LinkedList();  
+            et = (Element) jiedian.get(i);  
+            if (et.getTextTrim().equals("")) {  
+                if (et.getChildren().size() == 0)  
+                    continue;  
+                if (obj.containsKey(et.getName())) {  
+                    list = (List) obj.get(et.getName());  
+                }  
+                list.add(iterateElement(et));  
+                obj.put(et.getName(), list);  
+                System.out.println(et.getName()+et.getValue());
+            } else {  
+                if (obj.containsKey(et.getName())) {  
+                    list = (List) obj.get(et.getName());  
+                }  
+                list.add(et.getTextTrim());  
+                obj.put(et.getName(), list);  
+                System.out.println(et.getName()+et.getValue());
+            }  
+        }  
+        return obj;  
+    }  
 }
